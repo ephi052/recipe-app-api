@@ -7,4 +7,4 @@ def add(x, y):
 
 def sub(x, y):
     """ subtract x form y and return the result """
-    return 0
+    return x - y
