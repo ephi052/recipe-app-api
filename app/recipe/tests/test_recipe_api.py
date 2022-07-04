@@ -2,8 +2,6 @@
 Tests for recipe APIs.
 """
 from decimal import Decimal
-import email
-from unicodedata import decimal
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -22,9 +20,11 @@ from recipe.serializers import (
 
 RECIPES_URL = reverse('recipe:recipe-list')
 
+
 def detail_url(recipe_id):
     """Return recipe detail URL."""
     return reverse('recipe:recipe-detail', args=[recipe_id])
+
 
 def create_recipe(user, **params):
     """Create and return a sample recipe."""
@@ -39,6 +39,7 @@ def create_recipe(user, **params):
 
     recipe = Recipe.objects.create(user=user, **defaults)
     return recipe
+
 
 def create_user(**params):
     """Create and return a new user."""
@@ -63,7 +64,10 @@ class PrivateRecipeApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user(email='email@example.com,', password='password123')
+        self.user = create_user(
+            email='email@example.com,',
+            password='password123'
+            )
 
         self.client.force_authenticate(self.user)
 
@@ -81,7 +85,10 @@ class PrivateRecipeApiTests(TestCase):
 
     def test_recipe_list_limited_to_user(self):
         """Test list of recipes is limited to authenticated user."""
-        other_user = create_user(email='other@example.com', password='password123')
+        other_user = create_user(
+            email='other@example.com',
+            password='password123'
+            )
         create_recipe(user=other_user)
         create_recipe(user=self.user)
 
@@ -113,8 +120,10 @@ class PrivateRecipeApiTests(TestCase):
 
         res = self.client.post(RECIPES_URL, payload)
 
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED) # 201 created new resource created
-        recipe = Recipe.objects.get(id=res.data['id']) # get the recipe from db
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        # 201 created new resource created
+        recipe = Recipe.objects.get(id=res.data['id'])
+        # get the recipe from db
         for k, v in payload.items():
             self.assertEqual(getattr(recipe, k), v)
         self.assertEqual(recipe.user, self.user)  # Check that user is set
@@ -163,7 +172,10 @@ class PrivateRecipeApiTests(TestCase):
 
         def test_user_update_returns_error(self):
             """Test that only authenticated user can update a recipe."""
-            new_user = create_user(email='examp@example.com', password='password123')
+            new_user = create_user(
+                email='examp@example.com',
+                password='password123'
+                )
             recipe = create_recipe(user=self.user)
 
             payload = {'user': new_user.id}
@@ -184,7 +196,10 @@ class PrivateRecipeApiTests(TestCase):
 
         def test_recipe_other_user_recipe_error(self):
             """Test that only authenticated user can delete a recipe."""
-            new_user = create_user(email='ouser@example.com', password='password123')
+            new_user = create_user(
+                email='ouser@example.com',
+                password='password123'
+                )
             recipe = create_recipe(user=new_user)
 
             url = detail_url(recipe.id)
