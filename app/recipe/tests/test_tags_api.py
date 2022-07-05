@@ -14,6 +14,11 @@ from recipe.serializers import TagSerializer
 TAG_URL = reverse('recipe:tag-list')
 
 
+def detail_url(tag_id):
+    """Return tag detail URL"""
+    return reverse('recipe:tag-detail', args=[tag_id])
+
+
 def create_user(email='user@example.com', password='test_pass'):
     """Create and return a new user"""
     return get_user_model().objects.create_user(email, password)
@@ -66,3 +71,26 @@ class PrivateTagsApiTests(TestCase):
         # check tag name is correct
         self.assertEqual(res.data[0]['id'], tag.id)
         # check that the id is correct
+
+    def test_update_tag(self):
+        """Test updating a tag"""
+        tag = Tag.objects.create(user=self.user, name='Fruity')
+
+        payload = {'name': 'Vegan'}  # payload to update the name of the tag
+        res = self.client.patch(detail_url(tag.id), payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        tag.refresh_from_db()
+        self.assertEqual(tag.name, payload['name'])
+        # check that the tag name is updated
+
+    def test_delete_tag(self):
+        """Test deleting a tag"""
+        tag = Tag.objects.create(user=self.user, name='Vegan')
+        res = self.client.delete(detail_url(tag.id))
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        # 204 NO CONTENT status code is returned if the tag is deleted
+        tags = Tag.objects.filter(user=self.user)  # get all tags for user
+        self.assertFalse(tags.exists())
+        # check that the tag is deleted by checking that it doesn't exist
