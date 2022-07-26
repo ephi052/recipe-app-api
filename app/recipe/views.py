@@ -28,23 +28,24 @@ from recipe import serializers
 
 @extend_schema_view(
     list=extend_schema(
-        OpenApiParameter(
-            'tags',
-            OpenApiTypes.STR,
-            description='A comma separated list of tags to filter',
-        ),
-        OpenApiParameter(
-            'ingredients',
-            OpenApiTypes.STR,
-            description='A comma separated list of ingredients to filter',
-        )
+        parameters=[
+            OpenApiParameter(
+                'tags',
+                OpenApiTypes.STR,
+                description='Comma separated list of tag IDs to filter',
+            ),
+            OpenApiParameter(
+                'ingredients',
+                OpenApiTypes.STR,
+                description='Comma separated list of ingredient IDs to filter',
+            ),
+        ]
     )
 )
 class RecipeViewSet(viewsets.ModelViewSet):
     """
     ViewSet for the recipe APIs
     """
-    serializer_class = serializers.RecipeDetailSerializer
     serializer_class = serializers.RecipeDetailSerializer
     queryset = Recipe.objects.all()
     authentication_classes = [TokenAuthentication]
